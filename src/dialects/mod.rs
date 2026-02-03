@@ -2,7 +2,7 @@ mod single_byte;
 mod key_value;
 
 use std::io::{Read, Write};
-pub use single_byte::{SingleByteDialectValidator, SingleByteDialect};
+pub use single_byte::{SingleByteDialectValidator, SingleByteDialect, RecordTerminator};
 pub use key_value::{KeyValueDialectValidator, KeyValueDialect};
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Ord, PartialOrd)]

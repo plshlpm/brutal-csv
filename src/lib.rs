@@ -3,7 +3,7 @@
 use std::io::Read;
 use crate::dialects::{Dialect, DialectGroupValidator, KeyValueDialectValidator, SingleByteDialectValidator};
 
-mod dialects;
+pub mod dialects;
 
 #[derive(Default)]
 pub struct CsvSniffer {
