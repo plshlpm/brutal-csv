@@ -11,6 +11,7 @@
 //!
 
 use std::cmp::{min, max};
+use owo_colors::OwoColorize;
 use crate::dialects::key_value::KeyValueDialect;
 use super::super::{Dialect, DialectGroupValidator};
 
@@ -50,6 +51,11 @@ impl DialectGroupValidator for KeyValueDialectValidator {
         } else {
             None
         }
+    }
+    fn describe(&self) -> String {
+        let dialect = "KeyValueDialect";
+        let sep = char::from(self.field_separator);
+        format!("{} ({})", dialect.green().bold(), sep.yellow())
     }
 }
 
@@ -145,6 +151,7 @@ impl KeyValueDialectValidator {
         let ctx_min = max(0, pos.clamp(CONTEXT_SIZE, usize::MAX) - CONTEXT_SIZE);
         let ctx_max = min(buffer.len() - 1, pos + CONTEXT_SIZE);
         let context = String::from_utf8_lossy(&buffer[ctx_min..ctx_max]);
-        format!("{desc} at {}:{} (offset={}) near `{context}`", self.current_row, self.current_col, self.current_byte)
+        let error_message = format!("{desc} at {}:{} (offset={}) near", self.current_row, self.current_col, self.current_byte);
+        format!("{}\n`{context}`", error_message.red())
     }
 }

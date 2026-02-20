@@ -1,5 +1,6 @@
 #![doc = include_str!("../README.md")]
 
+use std::collections::HashMap;
 use std::io::Read;
 use crate::dialects::{Dialect, DialectGroupValidator, KeyValueDialectValidator, SingleByteDialectValidator};
 
@@ -7,7 +8,8 @@ mod dialects;
 
 #[derive(Default)]
 pub struct CsvSniffer {
-    validators: Vec<Box<dyn DialectGroupValidator>>
+    validators: Vec<Box<dyn DialectGroupValidator>>,
+    debug: HashMap<String, String>
 }
 
 impl CsvSniffer {
@@ -29,7 +31,8 @@ impl CsvSniffer {
         );
 
         Self {
-            validators
+            validators,
+            debug: HashMap::new()
         }
     }
 
@@ -56,9 +59,10 @@ impl CsvSniffer {
     fn process_chunk(&mut self, chunk: &[u8]) {
         self.validators.retain_mut(|c| {
             let res = c.try_process_chunk(chunk);
-            // if let Err(e) = &res {
-            //     eprintln!("{}", e)
-            // }
+            if let Err(e) = &res {
+                let dialect_description = c.describe();
+                self.debug.insert(dialect_description, e.to_string());
+            }
         
             res.is_ok()
         });
@@ -70,6 +74,10 @@ impl CsvSniffer {
             .into_iter()
             .filter_map(|mut x| x.finalize())
             .collect()
+    }
+
+    pub fn debug(&self) -> HashMap<String, String> {
+        self.debug.to_owned()
     }
 }
 

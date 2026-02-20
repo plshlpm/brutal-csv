@@ -14,6 +14,7 @@ pub enum Dialect {
 pub trait DialectGroupValidator {
     fn try_process_chunk(&mut self, chunk: &[u8]) -> Result<(), String>;
     fn finalize(&mut self) -> Option<Dialect>;
+    fn describe(&self) -> String;
 }
 
 trait Normalize {

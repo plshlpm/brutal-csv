@@ -12,6 +12,8 @@
 
 use std::cmp::{min, max};
 use std::string::FromUtf8Error;
+use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet};
+use owo_colors::OwoColorize;
 use super::super::{Dialect, DialectGroupValidator};
 use super::{RecordTerminator, SingleByteDialect};
 
@@ -97,6 +99,24 @@ impl DialectGroupValidator for SingleByteDialectValidator {
             has_quoted_line_breaks: self.has_quoted_line_breaks,
             total_rows: self.current_row,
         }))
+    }
+    fn describe(&self) -> String {
+        let record_term = match &self.record_terminator {
+            RecordTerminator::Crlf        => "CRLF".to_string(),
+            RecordTerminator::Byte(b'\n') => "LF".to_string(),
+            RecordTerminator::Byte(b'\r') => "CR".to_string(),
+            RecordTerminator::Byte(b)     => format!("Byte(0x{b:02X})"),
+        };
+
+        format!("{} field_separator: {} | quote_char: {} | escape_char: {} | record_terminator: {} | field_separator_is_terminator: {} | has_escaped_line_breaks: {} | has_quoted_line_breaks: {}",
+            "SingleByte Dialect".cyan().bold(),
+            format!("{:?}", char::from(self.field_separator)).yellow(),
+            format!("{:?}", self.quote_char.map(char::from)).yellow(),
+            format!("{:?}", self.escape_char.map(char::from)).yellow(),
+            record_term.yellow(),
+            self.field_separator_is_terminator.yellow(),
+            self.has_escaped_line_breaks.yellow(),
+            self.has_quoted_line_breaks.yellow())
     }
 }
 
@@ -447,7 +467,8 @@ impl SingleByteDialectValidator {
         let ctx_min = max(0, pos.clamp(CONTEXT_SIZE, usize::MAX) - CONTEXT_SIZE);
         let ctx_max = min(buffer.len() - 1, pos + CONTEXT_SIZE);
         let context = String::from_utf8_lossy(&buffer[ctx_min..ctx_max]);
-        format!("{desc} at {}:{} (offset={}) near `{context}`", self.current_row, self.current_col, self.current_byte)
+        let error_message = format!("{desc} at {}:{} (offset={}) near", self.current_row, self.current_col, self.current_byte);
+        format!("{}\n`{context}`", error_message.red())
     }
 }
 
