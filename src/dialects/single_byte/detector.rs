@@ -12,9 +12,8 @@
 
 use std::cmp::{min, max};
 use std::string::FromUtf8Error;
-use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet};
 use owo_colors::OwoColorize;
-use super::super::{Dialect, DialectGroupValidator};
+use super::super::{Dialect, DialectGroupValidator, format_error};
 use super::{RecordTerminator, SingleByteDialect};
 
 
@@ -462,13 +461,7 @@ impl SingleByteDialectValidator {
     }
     
     fn format_error(&self, desc: &'static str, buffer: &[u8], pos: usize) -> String {
-        const CONTEXT_SIZE: usize = 256;
-
-        let ctx_min = max(0, pos.clamp(CONTEXT_SIZE, usize::MAX) - CONTEXT_SIZE);
-        let ctx_max = min(buffer.len() - 1, pos + CONTEXT_SIZE);
-        let context = String::from_utf8_lossy(&buffer[ctx_min..ctx_max]);
-        let error_message = format!("{desc} at {}:{} (offset={}) near", self.current_row, self.current_col, self.current_byte);
-        format!("{}\n`{context}`", error_message.red())
+        format_error(desc, buffer, pos, self.current_row, self.current_col, self.current_byte)
     }
 }
 

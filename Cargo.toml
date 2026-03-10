@@ -8,11 +8,17 @@ clap = { version = "4.5.9", features = ["derive"] , optional = true }
 indicatif = { version = "0.17.8" , optional = true }
 clio = { version = "0.3.5", features = ["clap", "clap-parse"] , optional = true }
 owo-colors = "4"
-annotate-snippets = "0.12"
+miette = { version = "7", features = ["fancy"], optional = true }
+# annotate-snippets = { version = "0.12", optional = true }
 
 [features]
 binary = ["dep:clap", "dep:clio"]
 progress = ["dep:indicatif", "binary"]
+debug = ["dep:miette"]
+# debug = ["dep:annotate-snippets"]
+
+[dev-dependencies]
+brutal-csv = { path = ".", features = ["debug"] }
 
 [[bin]]
 name = "csv2asv"
