@@ -8,7 +8,7 @@ actually it's not as slow as you may think).
 It provides `CsvSniffer` struct that can validate CSV file and 
 return list of dialects for which file is valid.
 
-```rust
+```rust,ignore
 use std::fs::File;
 let mut sniffer = brutal_csv::CsvSniffer::new();
 let mut reader = File::open("/etc/group").unwrap(); // that's also CSV-like file
