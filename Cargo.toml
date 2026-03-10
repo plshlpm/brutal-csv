@@ -19,6 +19,7 @@ debug = ["dep:miette"]
 
 [dev-dependencies]
 brutal-csv = { path = ".", features = ["debug"] }
+rust-s3 = { version = "0.37", default-features = false, features = ["sync-native-tls", "fail-on-err"] }
 
 [[bin]]
 name = "csv2asv"

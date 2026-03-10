@@ -1,1 +1,3 @@
 target
+tests/.env
+tests/cache
