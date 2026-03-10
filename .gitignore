@@ -1,3 +1,4 @@
 target
 tests/.env
 tests/cache
+.idea
