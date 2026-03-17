@@ -9,6 +9,7 @@ indicatif = { version = "0.17.8" , optional = true }
 clio = { version = "0.3.5", features = ["clap", "clap-parse"] , optional = true }
 owo-colors = "4"
 miette = { version = "7", features = ["fancy"], optional = true }
+dotenv = "0.15.0"
 # annotate-snippets = { version = "0.12", optional = true }
 
 [features]
@@ -20,6 +21,7 @@ debug = ["dep:miette"]
 [dev-dependencies]
 brutal-csv = { path = ".", features = ["debug"] }
 rust-s3 = { version = "0.37", default-features = false, features = ["sync-native-tls", "fail-on-err"] }
+serde_json = "1"
 
 [[bin]]
 name = "csv2asv"

@@ -36,7 +36,10 @@ duplication of normalizer code or introducing an abstraction
 that will lead to performance loss.
 
 
-
-
+## Testing
+Test generic_csv read files from s3 bucket
+```bash
+cargo test
+```
 
 

@@ -1,4 +1,4 @@
 target
-tests/.env
+.env
 tests/cache
 .idea
