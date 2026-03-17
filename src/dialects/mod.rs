@@ -3,7 +3,7 @@ mod key_value;
 
 use std::cmp::min;
 use std::io::{Read, Write};
-pub use single_byte::{SingleByteDialectValidator, SingleByteDialect};
+pub use single_byte::{SingleByteDialectValidator, SingleByteDialect, RecordTerminator};
 pub use key_value::{KeyValueDialectValidator, KeyValueDialect};
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Ord, PartialOrd)]
@@ -60,28 +60,6 @@ fn format_error(desc: &'static str, buffer: &[u8], pos: usize, current_row: usiz
         out
     }
 
-    // #[cfg(feature = "debug")]
-    // {
-    //     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet};
-    //
-    //     let report = [Level::ERROR
-    //         .primary_title(desc)
-    //         .element(
-    //             Snippet::source(context.as_ref())
-    //                 .path("csv")
-    //                 .line_start(line_start)
-    //                 .fold(true)
-    //                 .annotation(
-    //                     AnnotationKind::Primary
-    //                         .span(span_start..span_end)
-    //                         .label(label.as_str())
-    //                 )
-    //         )
-    //     ];
-    //
-    //     Renderer::styled().render(&report).to_string()
-    // }
-
     #[cfg(not(feature = "debug"))]
     {
         let _ = (line_start, span_start, span_end);
@@ -90,6 +68,32 @@ fn format_error(desc: &'static str, buffer: &[u8], pos: usize, current_row: usiz
 }
 
 impl Dialect {
+    pub fn describe(&self) -> String {
+        match self {
+            Dialect::SingleByte(sb) => {
+                let record_term = match &sb.record_terminator {
+                    RecordTerminator::Crlf        => "CRLF".to_string(),
+                    RecordTerminator::Byte(b'\n') => "LF".to_string(),
+                    RecordTerminator::Byte(b'\r') => "CR".to_string(),
+                    RecordTerminator::Byte(b)     => format!("Byte(0x{b:02X})"),
+                };
+                format!(
+                    "SingleByte field_separator: {:?} | quote_char: {:?} | escape_char: {:?} | record_terminator: {} | field_separator_is_terminator: {} | has_escaped_line_breaks: {} | has_quoted_line_breaks: {}",
+                    char::from(sb.field_separator),
+                    sb.quote_char.map(char::from),
+                    sb.escape_char.map(char::from),
+                    record_term,
+                    sb.field_separator_is_terminator,
+                    sb.has_escaped_line_breaks,
+                    sb.has_quoted_line_breaks
+                )
+            }
+            Dialect::KeyValue(kv) => {
+                format!("KeyValue ({})", char::from(kv.field_separator))
+            }
+        }
+    }
+
     pub fn to_asv(&self, src: impl Read, dest: impl Write) {
         match self {
             Dialect::SingleByte(sb) => {

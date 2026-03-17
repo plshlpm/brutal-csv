@@ -2,7 +2,8 @@
 
 use std::collections::HashMap;
 use std::io::Read;
-use crate::dialects::{Dialect, DialectGroupValidator, KeyValueDialectValidator, SingleByteDialectValidator};
+use crate::dialects::{DialectGroupValidator, KeyValueDialectValidator, SingleByteDialectValidator};
+pub use crate::dialects::Dialect;
 
 mod dialects;
 
