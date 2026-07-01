@@ -60,11 +60,12 @@ impl DialectGroupValidator for KeyValueDialectValidator {
 
 
 impl KeyValueDialectValidator {
-    #[allow(clippy::single_element_loop)]
     pub fn make() -> Vec<Self> {
-        let mut v = Self::default();
-        v.field_separator = b':';
-        vec![v]
+        [b':', b';'].iter().map(|&sep| {
+            let mut v = Self::default();
+            v.field_separator = sep;
+            v
+        }).collect()
     }
 
     #[inline]
@@ -125,20 +126,22 @@ impl KeyValueDialectValidator {
 
     #[inline]
     fn end_row(&mut self) -> Result<(), &'static str> {
-        if self.current_col == 0 {
-            return Err("Only one column found")
-        }
-
+        
+        // if self.current_col == 0 {
+        //     return Err("Only one column found")
+        // }
+        
         if self.current_col != 1 {
             self.broken_rows += 1;
         }
 
+        self.current_cell_byte = 0;
         self.current_col = 0;
         self.current_row += 1;
 
         if self.broken_rows == self.current_row && self.broken_rows > 10000 {
             // todo: also may be http:// in right side, i've seen that somewhere
-            Err("10k rows analyzed, 3+ columns detected")
+            Err("10k rows analyzed, no valid rows detected")
         } else {
             Ok(())
         }
